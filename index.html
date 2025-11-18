@@ -5,94 +5,57 @@
   <title>CardStore</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <!-- CONTENEUR APP -->
-  <div id="app">
+  <div class="app">
+    <!-- HEADER -->
+    <header class="main-header">
+      <h1 class="logo">CARDSTORE</h1>
+      <p class="subtitle">Cartes cadeaux • Paiement TON</p>
+    </header>
 
-    <!-- PAGE BOUTIQUE -->
-    <section id="page-shop" class="page active">
-      <header class="app-header">
-        <div class="app-title-block">
-          <h1 class="app-name">CardStore</h1>
-          <p class="app-subtitle">Cartes cadeaux crypto</p>
-        </div>
-      </header>
-
-      <!-- Filtres -->
-      <div class="filters">
+    <!-- FILTRES -->
+    <section class="filters-row">
+      <div class="filter-group">
+        <label for="brandFilter">Marque</label>
         <select id="brandFilter" class="filter-select">
-          <option value="all">Toutes les marques</option>
+          <option value="all">Toutes</option>
         </select>
+      </div>
 
+      <div class="filter-group">
+        <label for="amountFilter">Montant</label>
         <select id="amountFilter" class="filter-select">
-          <option value="all">Tous les montants</option>
+          <option value="all">Tous</option>
           <option value="25">25€</option>
           <option value="50">50€</option>
           <option value="100">100€</option>
         </select>
       </div>
+    </section>
 
-      <!-- Grille produits -->
+    <!-- PRODUITS -->
+    <main>
       <div id="productsGrid" class="products-grid"></div>
-    </section>
-
-    <!-- PAGE PANIER -->
-    <section id="page-cart" class="page">
-      <header class="page-header">
-        <h2 class="page-title">Mon panier</h2>
-        <p class="page-subtitle">Résumé de tes cartes cadeaux</p>
-      </header>
-
-      <div id="cartContent" class="cart-content"></div>
-
-      <footer class="cart-footer">
-        <div class="cart-footer-left">
-          <span id="cartTotalLabel" class="cart-footer-label">Total</span>
-          <span id="cartTotalValue" class="cart-footer-value">0 €</span>
-        </div>
-        <button id="payButton" class="pay-btn">Payer en TON</button>
-      </footer>
-    </section>
-
-    <!-- PAGE PROFIL -->
-    <section id="page-profile" class="page">
-      <header class="page-header">
-        <h2 class="page-title">Profil</h2>
-        <p class="page-subtitle">Fonctionnalités à venir…</p>
-      </header>
-      <p class="profile-text">
-        Bientôt : historique d’achats, favoris, paramètres, etc.
-      </p>
-    </section>
-
+    </main>
   </div>
 
-  <!-- BARRE DE NAVIGATION -->
-  <nav class="nav-bar">
-    <button class="nav-btn" id="btn-shop">
-      <span class="nav-icon-emoji">🛍️</span>
-    </button>
+  <!-- BARRE PANIER -->
+  <footer class="cart-bar">
+    <div class="cart-info">
+      <span id="cartSummary" class="cart-summary">0 article</span>
+      <span id="cartTotal" class="cart-total">0 €</span>
+    </div>
+    <button id="payButton" class="pay-btn">Payer en TON</button>
+  </footer>
 
-    <button class="nav-btn active" id="btn-cart">
-      <span id="cartIcon" class="nav-icon-emoji cart-icon-wrapper">
-        🛒
-        <span id="cartBadge" class="cart-badge">0</span>
-      </span>
-    </button>
-
-    <button class="nav-btn" id="btn-profile">
-      <span class="nav-icon-emoji">👤</span>
-    </button>
-  </nav>
-
-  <!-- Conteneur pour l’orbe d’animation -->
+  <!-- Conteneur pour l’animation orbe -->
   <div id="animContainer"></div>
 
-  <!-- Script principal -->
   <script src="app.js"></script>
 </body>
 </html>

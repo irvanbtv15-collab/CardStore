@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>CardStore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header mini-app -->
+    <header class="app-header">
+      <div class="app-title">
+        <span class="app-name">CardStore</span>
+        <span class="app-subtitle">Cartes cadeaux crypto</span>
+      </div>
+    </header>
+
+    <!-- Filtres -->
+    <section class="filters">
+      <div class="filter-group">
+        <label for="brandFilter">Marque</label>
+        <select id="brandFilter">
+          <option value="all">Toutes les marques</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="amountFilter">Montant</label>
+        <select id="amountFilter">
+          <option value="all">Tous les montants</option>
+          <option value="25">25 €</option>
+          <option value="50">50 €</option>
+          <option value="100">100 €</option>
+          <option value="11">11 € (Spotify)</option>
+          <option value="33">33 € (Spotify)</option>
+          <option value="66">66 € (Spotify)</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Grille de produits -->
+    <main class="products-grid" id="productsGrid">
+      <!-- Cartes générées en JS -->
+    </main>
+
+    <!-- Barre panier en bas -->
+    <footer class="cart-bar" id="cartBar">
+      <div class="cart-info">
+        <span id="cartItemsCount">0 article</span>
+        <span id="cartTotal">0 €</span>
+      </div>
+      <button id="payButton" class="btn-primary">Payer en TON</button>
+    </footer>
+  </div>
+
+  <!-- Modal paiement -->
+  <div class="modal-backdrop" id="paymentModal">
+    <div class="modal">
+      <h2>Paiement en TON</h2>
+      <p id="paymentSummary"></p>
+      <div class="payment-address">
+        <span>Adresse TON :</span>
+        <code id="tonAddress"></code>
+      </div>
+      <p class="modal-note">
+        Envoie le montant indiqué en TON à cette adresse.<br />
+        Ensuite, envoie une preuve de paiement à l’admin.
+      </p>
+      <button id="closeModal" class="btn-secondary">Fermer</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

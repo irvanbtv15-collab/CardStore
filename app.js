@@ -1,7 +1,9 @@
-// Adresse TON où tu reçois les paiements
+/* ----------------------------------------- */
+/*          CONFIGURATION PRODUITS           */
+/* ----------------------------------------- */
+
 const TON_ADDRESS = "UQBTVuv4H6h-9wFxYSO1Z3w9IOAnz7_W-han4_";
 
-// Définition des marques et montants
 const BRANDS = [
   "Amazon",
   "Netflix",
@@ -19,7 +21,6 @@ const BRANDS = [
 const DEFAULT_AMOUNTS = [25, 50, 100];
 const SPOTIFY_AMOUNTS = [11, 33, 66];
 
-// Mapping marque → image
 const BRAND_IMAGES = {
   Amazon: "amazon.png",
   Netflix: "netflix.png",
@@ -34,8 +35,8 @@ const BRAND_IMAGES = {
   PlayStation: "playstation2.png"
 };
 
-// Génération des produits
 const PRODUCTS = [];
+
 BRANDS.forEach((brand) => {
   const amounts = brand === "Spotify" ? SPOTIFY_AMOUNTS : DEFAULT_AMOUNTS;
   amounts.forEach((amount) => {
@@ -45,40 +46,81 @@ BRANDS.forEach((brand) => {
       amount,
       title: `${brand} ${amount}€`,
       subtitle: "Carte cadeau",
-      image: BRAND_IMAGES[brand] || "",
+      image: BRAND_IMAGES[brand],
       badge: "GIFT CARD"
     });
   });
 });
 
-// Panier : { productId: qty }
-const cart = {};
+/* ----------------------------------------- */
+/*                 PANIER                    */
+/* ----------------------------------------- */
 
-// Telegram init
-function initTelegram() {
-  if (window.Telegram && window.Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-  }
+const cart = {};  
+
+function adjustQty(productId, delta, element, event) {
+  const current = cart[productId] || 0;
+  let next = current + delta;
+  if (next < 0) next = 0;
+
+  cart[productId] = next;
+  element.textContent = next;
+
+  if (next === 0) delete cart[productId];
+
+  updateCartBadge();
+  renderCartPage();
+
+  if (delta > 0) animateToCart(event);
 }
 
-// Filtres
-function initFilters() {
-  const brandSelect = document.getElementById("brandFilter");
-  BRANDS.forEach((brand) => {
-    const opt = document.createElement("option");
-    opt.value = brand;
-    opt.textContent = brand;
-    brandSelect.appendChild(opt);
+function updateCartBadge() {
+  const badge = document.getElementById("cartBadge");
+  const count = Object.values(cart).reduce((a, b) => a + b, 0);
+  badge.textContent = count;
+}
+
+/* ----------------------------------------- */
+/*           ANIMATION → PANIER              */
+/* ----------------------------------------- */
+
+function animateToCart(event) {
+  const animContainer = document.getElementById("animContainer");
+
+  const orb = document.createElement("div");
+  orb.className = "orb";
+  animContainer.appendChild(orb);
+
+  const startX = event.clientX;
+  const startY = event.clientY;
+
+  orb.style.left = startX - 10 + "px";
+  orb.style.top = startY - 10 + "px";
+
+  const cartIcon = document.getElementById("cartIcon");
+  const rect = cartIcon.getBoundingClientRect();
+
+  const endX = rect.left + rect.width / 2;
+  const endY = rect.top + rect.height / 2;
+
+  requestAnimationFrame(() => {
+    orb.style.transform = "scale(0.4)";
+    orb.style.left = endX + "px";
+    orb.style.top = endY + "px";
+    orb.style.opacity = "0";
   });
 
-  brandSelect.addEventListener("change", renderProducts);
-  document
-    .getElementById("amountFilter")
-    .addEventListener("change", renderProducts);
+  setTimeout(() => {
+    orb.remove();
+    cartIcon.classList.add("pulse-cart");
+    setTimeout(() => cartIcon.classList.remove("pulse-cart"), 450);
+  }, 350);
 }
 
-// Rendu des produits (boutique)
+/* ----------------------------------------- */
+/*            AFFICHAGE PRODUITS             */
+/* ----------------------------------------- */
+
 function renderProducts() {
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = "";
@@ -87,9 +129,8 @@ function renderProducts() {
   const amountFilter = document.getElementById("amountFilter").value;
 
   const filtered = PRODUCTS.filter((p) => {
-    const brandOk = brandFilter === "all" || p.brand === brandFilter;
-    const amountOk = amountFilter === "all" || p.amount === Number(amountFilter);
-    return brandOk && amountOk;
+    return (brandFilter === "all" || p.brand === brandFilter) &&
+           (amountFilter === "all" || p.amount === Number(amountFilter));
   });
 
   filtered.forEach((product) => {
@@ -106,8 +147,7 @@ function renderProducts() {
 
     const img = document.createElement("img");
     img.className = "product-image";
-    img.src = product.image || "";
-    img.alt = product.title;
+    img.src = product.image;
     imgWrapper.appendChild(img);
     card.appendChild(imgWrapper);
 
@@ -117,20 +157,17 @@ function renderProducts() {
     const title = document.createElement("div");
     title.className = "product-title";
     title.textContent = product.title;
-    body.appendChild(title);
 
     const subtitle = document.createElement("div");
     subtitle.className = "product-subtitle";
     subtitle.textContent = product.subtitle;
-    body.appendChild(subtitle);
 
     const bottom = document.createElement("div");
     bottom.className = "product-bottom";
 
     const price = document.createElement("div");
     price.className = "product-price";
-    price.innerHTML = `${product.amount} € <span>carte</span>`;
-    bottom.appendChild(price);
+    price.innerHTML = `${product.amount} €`;
 
     const qtyControl = document.createElement("div");
     qtyControl.className = "qty-control";
@@ -139,26 +176,26 @@ function renderProducts() {
     minus.className = "qty-btn";
     minus.textContent = "-";
 
-    const value = document.createElement("span");
-    value.className = "qty-value";
-    value.textContent = cart[product.id] || 0;
+    const val = document.createElement("span");
+    val.className = "qty-value";
+    val.textContent = cart[product.id] || 0;
 
     const plus = document.createElement("button");
     plus.className = "qty-btn";
     plus.textContent = "+";
 
-    minus.addEventListener("click", () =>
-      adjustQty(product.id, -1, value)
-    );
-    plus.addEventListener("click", () =>
-      adjustQty(product.id, 1, value)
-    );
+    minus.addEventListener("click", (e) => adjustQty(product.id, -1, val, e));
+    plus.addEventListener("click", (e) => adjustQty(product.id, 1, val, e));
 
     qtyControl.appendChild(minus);
-    qtyControl.appendChild(value);
+    qtyControl.appendChild(val);
     qtyControl.appendChild(plus);
 
+    bottom.appendChild(price);
     bottom.appendChild(qtyControl);
+
+    body.appendChild(title);
+    body.appendChild(subtitle);
     body.appendChild(bottom);
 
     card.appendChild(body);
@@ -166,173 +203,102 @@ function renderProducts() {
   });
 }
 
-// Ajustement quantité
-function adjustQty(productId, delta, valueElement) {
-  const current = cart[productId] || 0;
-  let next = current + delta;
-  if (next < 0) next = 0;
+/* ----------------------------------------- */
+/*            PAGE PANIER                    */
+/* ----------------------------------------- */
 
-  cart[productId] = next;
-  valueElement.textContent = next;
-
-  if (next === 0) {
-    delete cart[productId];
-  }
-
-  updateCartBar();
-  renderCartView();
-}
-
-// Mise à jour barre panier + pulse
-function updateCartBar() {
-  const cartItems = Object.entries(cart);
-  const count = cartItems.reduce((acc, [, qty]) => acc + qty, 0);
-  const total = cartItems.reduce((acc, [id, qty]) => {
-    const product = PRODUCTS.find((p) => p.id === id);
-    return acc + product.amount * qty;
-  }, 0);
-
-  const countEl = document.getElementById("cartItemsCount");
-  const totalEl = document.getElementById("cartTotal");
-
-  countEl.textContent = count === 1 ? "1 article" : `${count} articles`;
-  totalEl.textContent = `${total} €`;
-
-  const totalPage = document.getElementById("cartTotalPage");
-  if (totalPage) {
-    totalPage.textContent = `${total} €`;
-  }
-
-  // Animation pulse sur la barre
-  const bar = document.querySelector(".cart-bar");
-  if (bar) {
-    bar.classList.remove("pulse");
-    void bar.offsetWidth;
-    bar.classList.add("pulse");
-  }
-}
-
-// Rendu de la vue panier (page)
-function renderCartView() {
-  const container = document.getElementById("cartItemsList");
+function renderCartPage() {
+  const container = document.getElementById("cartContent");
   container.innerHTML = "";
 
-  const cartItems = Object.entries(cart);
-  if (cartItems.length === 0) {
-    container.innerHTML = `<p style="font-size:13px;color:#aaa;">Ton panier est vide. Ajoute des cartes depuis l’onglet boutique 🏪.</p>`;
+  const items = Object.entries(cart);
+  if (items.length === 0) {
+    container.innerHTML = "<p style='opacity:0.6'>Votre panier est vide.</p>";
     return;
   }
 
-  cartItems.forEach(([id, qty]) => {
+  items.forEach(([id, qty]) => {
     const product = PRODUCTS.find((p) => p.id === id);
-    if (!product) return;
 
     const row = document.createElement("div");
-    row.className = "cart-item-row";
+    row.className = "cart-row";
 
-    const main = document.createElement("div");
-    main.className = "cart-item-main";
-
-    const brandEl = document.createElement("div");
-    brandEl.className = "cart-item-brand";
-    brandEl.textContent = product.brand;
-    main.appendChild(brandEl);
-
-    const meta = document.createElement("div");
-    meta.className = "cart-item-meta";
-    meta.textContent = `${product.amount}€ × ${qty}`;
-    main.appendChild(meta);
-
-    const total = document.createElement("div");
-    total.className = "cart-item-total";
-    total.textContent = `${product.amount * qty} €`;
-
-    row.appendChild(main);
-    row.appendChild(total);
+    row.innerHTML = `
+      <div class="cart-row-left">
+        <img src="${product.image}" class="cart-img"/>
+        <div>
+          <div class="cart-title">${product.title}</div>
+          <div class="cart-qty">${qty} × ${product.amount} €</div>
+        </div>
+      </div>
+      <div class="cart-total">${product.amount * qty} €</div>
+    `;
     container.appendChild(row);
   });
 }
 
-// Init bouton payer (barre + page)
-function initCartBar() {
-  document.getElementById("payButton").addEventListener("click", openPaymentModal);
-  const payPage = document.getElementById("payButtonPage");
-  payPage.addEventListener("click", openPaymentModal);
+/* ----------------------------------------- */
+/*        NAVIGATION ENTRE LES PAGES         */
+/* ----------------------------------------- */
+
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(n => n.classList.remove("active"));
 }
 
-// Modal paiement
-function openPaymentModal() {
-  const cartItems = Object.entries(cart);
-  if (cartItems.length === 0) {
-    alert("Ton panier est vide.");
-    return;
-  }
+document.getElementById("btn-shop").addEventListener("click", () => {
+  showPage("page-shop");
+  document.getElementById("btn-shop").classList.add("active");
+});
 
-  const total = cartItems.reduce((acc, [id, qty]) => {
-    const product = PRODUCTS.find((p) => p.id === id);
-    return acc + product.amount * qty;
-  }, 0);
+document.getElementById("btn-cart").addEventListener("click", () => {
+  showPage("page-cart");
+  document.getElementById("btn-cart").classList.add("active");
+  renderCartPage();
+});
 
-  const lines = cartItems.map(([id, qty]) => {
-    const product = PRODUCTS.find((p) => p.id === id);
-    return `• ${product.brand} ${product.amount}€ × ${qty}`;
-  });
+document.getElementById("btn-profile").addEventListener("click", () => {
+  showPage("page-profile");
+  document.getElementById("btn-profile").classList.add("active");
+});
 
-  const summary = `Total : ${total} €\n\n${lines.join("\n")}`;
-  document.getElementById("paymentSummary").textContent = summary;
-  document.getElementById("tonAddress").textContent = TON_ADDRESS;
+/* ----------------------------------------- */
+/*                INIT                       */
+/* ----------------------------------------- */
 
-  document.getElementById("paymentModal").classList.add("active");
-}
-
-function initModal() {
-  document.getElementById("closeModal").addEventListener("click", () => {
-    document.getElementById("paymentModal").classList.remove("active");
-  });
-}
-
-// Onglets (nav métal argent)
-function initTabs() {
-  const views = {
-    shop: document.getElementById("shopView"),
-    cart: document.getElementById("cartView"),
-    profile: document.getElementById("profileView")
-  };
-
-  const navButtons = document.querySelectorAll(".nav-btn");
-
-  function setActiveTab(tab) {
-    Object.keys(views).forEach((key) => {
-      if (views[key]) {
-        views[key].classList.toggle("view-active", key === tab);
-        views[key].classList.toggle("view-hidden", key !== tab);
-      }
-    });
-
-    navButtons.forEach((btn) => {
-      btn.classList.toggle("nav-btn-active", btn.dataset.tab === tab);
-    });
-  }
-
-  navButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const tab = btn.dataset.tab;
-      setActiveTab(tab);
-    });
-  });
-
-  // Onglet par défaut = panier
-  setActiveTab("cart");
-}
-
-// INITIALISATION
 document.addEventListener("DOMContentLoaded", () => {
-  initTelegram();
+  Telegram.WebApp.ready();
+
   initFilters();
   renderProducts();
-  updateCartBar();
-  renderCartView();
-  initCartBar();
-  initModal();
-  initTabs();
+  renderCartPage();
+
+  updateCartBadge();
+
+  /* Onglet par défaut = PANIER */
+  document.getElementById("btn-cart").click();
 });
+
+/* ----------------------------------------- */
+/*           INIT DES FILTRES                */
+/* ----------------------------------------- */
+
+function initFilters() {
+  const brandSelect = document.getElementById("brandFilter");
+  BRANDS.forEach((b) => {
+    const opt = document.createElement("option");
+    opt.value = b;
+    opt.textContent = b;
+    brandSelect.appendChild(opt);
+  });
+
+  document
+    .getElementById("brandFilter")
+    .addEventListener("change", renderProducts);
+
+  document
+    .getElementById("amountFilter")
+    .addEventListener("change", renderProducts);
+}

@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <title>CardStore</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Styles -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -28,6 +32,7 @@
                 <option value="all">Toutes</option>
               </select>
             </div>
+
             <div class="filter-group">
               <label for="amountFilter">Montant</label>
               <select id="amountFilter">
@@ -50,9 +55,11 @@
         <!-- VUE PANIER (onglet par défaut) -->
         <section id="cartView" class="view view-active">
           <h2 class="view-title">🛒 Ton panier</h2>
+
           <div id="cartItemsList" class="cart-items-list">
             <!-- Items panier générés en JS -->
           </div>
+
           <div class="cart-summary-page">
             <div class="cart-summary-line">
               <span>Total</span>
@@ -87,7 +94,13 @@
     <!-- NAV BAR MÉTAL ARGENT -->
     <nav class="bottom-nav">
       <button class="nav-btn" data-tab="shop" aria-label="Boutique">🏪</button>
-      <button class="nav-btn nav-btn-active" data-tab="cart" aria-label="Panier">🛒</button>
+      <button
+        class="nav-btn nav-btn-active"
+        data-tab="cart"
+        aria-label="Panier"
+      >
+        🛒
+      </button>
       <button class="nav-btn" data-tab="profile" aria-label="Profil">👤</button>
     </nav>
 
@@ -112,6 +125,7 @@
       </div>
     </div>
 
+    <!-- LOGIQUE APP -->
     <script src="app.js"></script>
   </body>
 </html>

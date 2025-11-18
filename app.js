@@ -1,6 +1,4 @@
-/* ----------------------------------------- */
-/*          CONFIGURATION PRODUITS           */
-/* ----------------------------------------- */
+/* CONFIG DE BASE */
 
 const TON_ADDRESS = "UQBTVuv4H6h-9wFxYSO1Z3w9IOAnz7_W-han4_";
 
@@ -52,26 +50,27 @@ BRANDS.forEach((brand) => {
   });
 });
 
-/* ----------------------------------------- */
-/*                 PANIER                    */
-/* ----------------------------------------- */
+/* PANIER */
 
-const cart = {};  
+const cart = {};
 
-function adjustQty(productId, delta, element, event) {
+function adjustQty(productId, delta, valueElement, event) {
   const current = cart[productId] || 0;
   let next = current + delta;
   if (next < 0) next = 0;
 
-  cart[productId] = next;
-  element.textContent = next;
-
   if (next === 0) delete cart[productId];
+  else cart[productId] = next;
+
+  valueElement.textContent = next;
 
   updateCartBadge();
   renderCartPage();
+  updateCartFooterTotal();
 
-  if (delta > 0) animateToCart(event);
+  if (delta > 0 && event) {
+    animateToCart(event);
+  }
 }
 
 function updateCartBadge() {
@@ -80,33 +79,28 @@ function updateCartBadge() {
   badge.textContent = count;
 }
 
-/* ----------------------------------------- */
-/*           ANIMATION → PANIER              */
-/* ----------------------------------------- */
+/* ORBE ANIMATION VERS PANIER */
 
 function animateToCart(event) {
   const animContainer = document.getElementById("animContainer");
-
   const orb = document.createElement("div");
   orb.className = "orb";
   animContainer.appendChild(orb);
 
   const startX = event.clientX;
   const startY = event.clientY;
-
   orb.style.left = startX - 10 + "px";
   orb.style.top = startY - 10 + "px";
 
   const cartIcon = document.getElementById("cartIcon");
   const rect = cartIcon.getBoundingClientRect();
-
   const endX = rect.left + rect.width / 2;
   const endY = rect.top + rect.height / 2;
 
   requestAnimationFrame(() => {
-    orb.style.transform = "scale(0.4)";
     orb.style.left = endX + "px";
     orb.style.top = endY + "px";
+    orb.style.transform = "scale(0.4)";
     orb.style.opacity = "0";
   });
 
@@ -117,9 +111,7 @@ function animateToCart(event) {
   }, 350);
 }
 
-/* ----------------------------------------- */
-/*            AFFICHAGE PRODUITS             */
-/* ----------------------------------------- */
+/* RENDER PRODUITS */
 
 function renderProducts() {
   const grid = document.getElementById("productsGrid");
@@ -129,8 +121,9 @@ function renderProducts() {
   const amountFilter = document.getElementById("amountFilter").value;
 
   const filtered = PRODUCTS.filter((p) => {
-    return (brandFilter === "all" || p.brand === brandFilter) &&
-           (amountFilter === "all" || p.amount === Number(amountFilter));
+    const brandOk = brandFilter === "all" || p.brand === brandFilter;
+    const amountOk = amountFilter === "all" || p.amount === Number(amountFilter);
+    return brandOk && amountOk;
   });
 
   filtered.forEach((product) => {
@@ -151,9 +144,6 @@ function renderProducts() {
     imgWrapper.appendChild(img);
     card.appendChild(imgWrapper);
 
-    const body = document.createElement("div");
-    body.className = "product-body";
-
     const title = document.createElement("div");
     title.className = "product-title";
     title.textContent = product.title;
@@ -167,7 +157,7 @@ function renderProducts() {
 
     const price = document.createElement("div");
     price.className = "product-price";
-    price.innerHTML = `${product.amount} €`;
+    price.textContent = `${product.amount} €`;
 
     const qtyControl = document.createElement("div");
     qtyControl.className = "qty-control";
@@ -176,36 +166,33 @@ function renderProducts() {
     minus.className = "qty-btn";
     minus.textContent = "-";
 
-    const val = document.createElement("span");
-    val.className = "qty-value";
-    val.textContent = cart[product.id] || 0;
+    const value = document.createElement("span");
+    value.className = "qty-value";
+    value.textContent = cart[product.id] || 0;
 
     const plus = document.createElement("button");
     plus.className = "qty-btn";
     plus.textContent = "+";
 
-    minus.addEventListener("click", (e) => adjustQty(product.id, -1, val, e));
-    plus.addEventListener("click", (e) => adjustQty(product.id, 1, val, e));
+    minus.addEventListener("click", (e) => adjustQty(product.id, -1, value, e));
+    plus.addEventListener("click", (e) => adjustQty(product.id, 1, value, e));
 
     qtyControl.appendChild(minus);
-    qtyControl.appendChild(val);
+    qtyControl.appendChild(value);
     qtyControl.appendChild(plus);
 
     bottom.appendChild(price);
     bottom.appendChild(qtyControl);
 
-    body.appendChild(title);
-    body.appendChild(subtitle);
-    body.appendChild(bottom);
+    card.appendChild(title);
+    card.appendChild(subtitle);
+    card.appendChild(bottom);
 
-    card.appendChild(body);
     grid.appendChild(card);
   });
 }
 
-/* ----------------------------------------- */
-/*            PAGE PANIER                    */
-/* ----------------------------------------- */
+/* PAGE PANIER */
 
 function renderCartPage() {
   const container = document.getElementById("cartContent");
@@ -213,19 +200,18 @@ function renderCartPage() {
 
   const items = Object.entries(cart);
   if (items.length === 0) {
-    container.innerHTML = "<p style='opacity:0.6'>Votre panier est vide.</p>";
+    container.innerHTML = "<p style='opacity:0.7;font-size:14px;'>Ton panier est vide.</p>";
     return;
   }
 
   items.forEach(([id, qty]) => {
-    const product = PRODUCTS.find((p) => p.id === id);
-
+    const product = PRODUCTS.find(p => p.id === id);
     const row = document.createElement("div");
     row.className = "cart-row";
 
     row.innerHTML = `
       <div class="cart-row-left">
-        <img src="${product.image}" class="cart-img"/>
+        <img src="${product.image}" class="cart-img" />
         <div>
           <div class="cart-title">${product.title}</div>
           <div class="cart-qty">${qty} × ${product.amount} €</div>
@@ -233,19 +219,28 @@ function renderCartPage() {
       </div>
       <div class="cart-total">${product.amount * qty} €</div>
     `;
+
     container.appendChild(row);
   });
 }
 
-/* ----------------------------------------- */
-/*        NAVIGATION ENTRE LES PAGES         */
-/* ----------------------------------------- */
+function updateCartFooterTotal() {
+  const items = Object.entries(cart);
+  const total = items.reduce((acc, [id, qty]) => {
+    const product = PRODUCTS.find(p => p.id === id);
+    return acc + product.amount * qty;
+  }, 0);
+
+  document.getElementById("cartTotalValue").textContent = `${total} €`;
+}
+
+/* NAVIGATION ENTRE PAGES */
 
 function showPage(pageId) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(pageId).classList.add("active");
 
-  document.querySelectorAll(".nav-btn").forEach(n => n.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
 }
 
 document.getElementById("btn-shop").addEventListener("click", () => {
@@ -264,26 +259,7 @@ document.getElementById("btn-profile").addEventListener("click", () => {
   document.getElementById("btn-profile").classList.add("active");
 });
 
-/* ----------------------------------------- */
-/*                INIT                       */
-/* ----------------------------------------- */
-
-document.addEventListener("DOMContentLoaded", () => {
-  Telegram.WebApp.ready();
-
-  initFilters();
-  renderProducts();
-  renderCartPage();
-
-  updateCartBadge();
-
-  /* Onglet par défaut = PANIER */
-  document.getElementById("btn-cart").click();
-});
-
-/* ----------------------------------------- */
-/*           INIT DES FILTRES                */
-/* ----------------------------------------- */
+/* INIT */
 
 function initFilters() {
   const brandSelect = document.getElementById("brandFilter");
@@ -294,11 +270,21 @@ function initFilters() {
     brandSelect.appendChild(opt);
   });
 
-  document
-    .getElementById("brandFilter")
-    .addEventListener("change", renderProducts);
-
-  document
-    .getElementById("amountFilter")
-    .addEventListener("change", renderProducts);
+  brandSelect.addEventListener("change", renderProducts);
+  document.getElementById("amountFilter").addEventListener("change", renderProducts);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+  }
+
+  initFilters();
+  renderProducts();
+  renderCartPage();
+  updateCartBadge();
+  updateCartFooterTotal();
+
+  // Onglet par défaut : boutique
+  document.getElementById("btn-shop").classList.add("active");
+});

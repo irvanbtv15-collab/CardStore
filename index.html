@@ -9,7 +9,6 @@
   </head>
   <body>
     <div id="app">
-      <!-- HEADER -->
       <header class="app-header">
         <div class="app-title">
           <div class="app-name">CardStore</div>
@@ -17,9 +16,7 @@
         </div>
       </header>
 
-      <!-- VUES (onglets) -->
       <main>
-        <!-- VUE BOUTIQUE -->
         <section id="shopView" class="view view-hidden">
           <div class="filters">
             <div class="filter-group">
@@ -42,40 +39,28 @@
             </div>
           </div>
 
-          <section id="productsGrid" class="products-grid">
-            <!-- Cartes générées en JS -->
-          </section>
+          <section id="productsGrid" class="products-grid"></section>
         </section>
 
-        <!-- VUE PANIER (onglet par défaut) -->
         <section id="cartView" class="view view-active">
           <h2 class="view-title">🛒 Ton panier</h2>
-          <div id="cartItemsList" class="cart-items-list">
-            <!-- Items panier générés en JS -->
-          </div>
+          <div id="cartItemsList" class="cart-items-list"></div>
           <div class="cart-summary-page">
             <div class="cart-summary-line">
               <span>Total</span>
               <span id="cartTotalPage">0 €</span>
             </div>
-            <button id="payButtonPage" class="btn-primary wide">
-              Payer en TON
-            </button>
+            <button id="payButtonPage" class="btn-primary wide">Payer en TON</button>
           </div>
         </section>
 
-        <!-- VUE PROFIL (placeholder) -->
         <section id="profileView" class="view view-hidden">
           <h2 class="view-title">👤 Profil</h2>
-          <p class="profile-text">
-            Bientôt : historique des achats, gestion des comptes, promos
-            personnalisées...
-          </p>
+          <p class="profile-text">Bientôt : historique des achats, gestion des comptes, promos personnalisées...</p>
         </section>
       </main>
     </div>
 
-    <!-- BARRE PANIER FIXE (HUD) -->
     <div class="cart-bar">
       <div class="cart-info">
         <span id="cartItemsCount">0 article</span>
@@ -84,14 +69,12 @@
       <button id="payButton" class="btn-primary">Payer en TON</button>
     </div>
 
-    <!-- NAV BAR MÉTAL ARGENT -->
     <nav class="bottom-nav">
       <button class="nav-btn" data-tab="shop" aria-label="Boutique">🏪</button>
       <button class="nav-btn nav-btn-active" data-tab="cart" aria-label="Panier">🛒</button>
       <button class="nav-btn" data-tab="profile" aria-label="Profil">👤</button>
     </nav>
 
-    <!-- MODAL PAIEMENT -->
     <div id="paymentModal" class="modal-backdrop">
       <div class="modal">
         <h2>Paiement TON</h2>
@@ -103,10 +86,7 @@
           <code id="tonAddress"></code>
         </div>
 
-        <p class="modal-note">
-          Après ton paiement, envoie le reçu ou TX hash pour recevoir tes cartes
-          cadeaux.
-        </p>
+        <p class="modal-note">Après ton paiement, envoie le reçu ou TX hash pour recevoir tes cartes cadeaux.</p>
 
         <button id="closeModal" class="btn-secondary">Fermer</button>
       </div>

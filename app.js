@@ -27,11 +27,11 @@ const BRAND_IMAGES = {
   Spotify: "images/spotify.png",
   Airbnb: "images/airbnb.png",
   Adidas: "images/adidas.png",
-  Footlocker: "images/footlocker.png",
+  Footlocker: "images/footlocker2.png",
   Flixbus: "images/flixbus.png",
   Nintendo: "images/nintendo.png",
   Xbox: "images/xbox.png",
-  PlayStation: "images/playstation.png"
+  PlayStation: "images/playstation2.png"
 };
 
 // Génération de la liste de produits (une carte par montant)
@@ -228,3 +228,4 @@ document.addEventListener("DOMContentLoaded", () => {
   initCartBar();
   initModal();
 });
+

@@ -19,7 +19,7 @@ const BRANDS = [
 const DEFAULT_AMOUNTS = [25, 50, 100];
 const SPOTIFY_AMOUNTS = [11, 33, 66];
 
-// Petit mapping marque → image
+// Images des cartes-cadeaux
 const BRAND_IMAGES = {
   Amazon: "amazon.png",
   Netflix: "netflix.png",
@@ -34,10 +34,8 @@ const BRAND_IMAGES = {
   PlayStation: "playstation2.png"
 };
 
-
-// Génération de la liste de produits (une carte par montant)
+// Construction automatique des produits
 const PRODUCTS = [];
-
 BRANDS.forEach((brand) => {
   const amounts = brand === "Spotify" ? SPOTIFY_AMOUNTS : DEFAULT_AMOUNTS;
   amounts.forEach((amount) => {
@@ -53,7 +51,7 @@ BRANDS.forEach((brand) => {
   });
 });
 
-// État du panier : { productId: qty }
+// Panier : { productId: qty }
 const cart = {};
 
 function initTelegram() {
@@ -144,8 +142,12 @@ function renderProducts() {
     plus.className = "qty-btn";
     plus.textContent = "+";
 
-    minus.addEventListener("click", () => adjustQty(product.id, -1, value));
-    plus.addEventListener("click", () => adjustQty(product.id, 1, value));
+    minus.addEventListener("click", () =>
+      adjustQty(product.id, -1, value)
+    );
+    plus.addEventListener("click", () =>
+      adjustQty(product.id, 1, value)
+    );
 
     qtyControl.appendChild(minus);
     qtyControl.appendChild(value);
@@ -162,27 +164,36 @@ function renderProducts() {
 function adjustQty(productId, delta, valueElement) {
   const current = cart[productId] || 0;
   let next = current + delta;
+
   if (next < 0) next = 0;
+
   cart[productId] = next;
   valueElement.textContent = next;
-  if (next === 0) {
-    delete cart[productId];
-  }
+
+  if (next === 0) delete cart[productId];
+
   updateCartBar();
 }
 
 function updateCartBar() {
   const cartItems = Object.entries(cart);
+
   const count = cartItems.reduce((acc, [, qty]) => acc + qty, 0);
   const total = cartItems.reduce((acc, [id, qty]) => {
-    const product = PRODUCTS.find((p) => p.id === id);
-    return acc + product.amount * qty;
+    const p = PRODUCTS.find((x) => x.id === id);
+    return acc + p.amount * qty;
   }, 0);
 
-  const countEl = document.getElementById("cartItemsCount");
-  const totalEl = document.getElementById("cartTotal");
-  countEl.textContent = count === 1 ? "1 article" : `${count} articles`;
-  totalEl.textContent = `${total} €`;
+  document.getElementById("cartItemsCount").textContent =
+    count === 1 ? "1 article" : `${count} articles`;
+
+  document.getElementById("cartTotal").textContent = `${total} €`;
+
+  // 🔥 Animation Futuriste CyberPulse
+  const bar = document.querySelector(".cart-bar");
+  bar.classList.remove("pulse");
+  void bar.offsetWidth; // Reset animation
+  bar.classList.add("pulse");
 }
 
 function initCartBar() {
@@ -191,6 +202,7 @@ function initCartBar() {
 
 function openPaymentModal() {
   const cartItems = Object.entries(cart);
+
   if (cartItems.length === 0) {
     alert("Ton panier est vide.");
     return;
@@ -220,7 +232,7 @@ function initModal() {
   });
 }
 
-// INITIALISATION
+// Initialisation
 document.addEventListener("DOMContentLoaded", () => {
   initTelegram();
   initFilters();
@@ -229,5 +241,3 @@ document.addEventListener("DOMContentLoaded", () => {
   initCartBar();
   initModal();
 });
-
-

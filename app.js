@@ -1,6 +1,29 @@
 // Adresse TON où tu reçois les paiements
 const TON_ADDRESS = "UQBTVuv4H6h-9wFxYSO1Z3w9IOAnz7_W-han4_";
 
+// === ANIMATION: FLY TO CART ===
+function flyToCart(imgElement) {
+  if (!imgElement) return;
+  const imgRect = imgElement.getBoundingClientRect();
+  const cartBar = document.querySelector(".cart-bar");
+  if (!cartBar) return;
+  const cartRect = cartBar.getBoundingClientRect();
+
+  const clone = imgElement.cloneNode(true);
+  clone.classList.add("fly-img");
+  document.body.appendChild(clone);
+
+  clone.style.left = imgRect.left + "px";
+  clone.style.top = imgRect.top + "px";
+
+  requestAnimationFrame(() => {
+    clone.style.transform = `translate(${cartRect.left - imgRect.left + 40}px, ${cartRect.top - imgRect.top}px) scale(0.2)`;
+    clone.style.opacity = "0";
+  });
+
+  setTimeout(() => clone.remove(), 700);
+}
+
 // Définition des marques et montants
 const BRANDS = [
   "Amazon",
@@ -73,9 +96,7 @@ function initFilters() {
   });
 
   brandSelect.addEventListener("change", renderProducts);
-  document
-    .getElementById("amountFilter")
-    .addEventListener("change", renderProducts);
+  document.getElementById("amountFilter").addEventListener("change", renderProducts);
 }
 
 // Rendu des produits (boutique)
@@ -147,12 +168,14 @@ function renderProducts() {
     plus.className = "qty-btn";
     plus.textContent = "+";
 
-    minus.addEventListener("click", () =>
-      adjustQty(product.id, -1, value)
-    );
-    plus.addEventListener("click", () =>
-      adjustQty(product.id, 1, value)
-    );
+    minus.addEventListener("click", () => {
+      adjustQty(product.id, -1, value);
+    });
+
+    plus.addEventListener("click", () => {
+      adjustQty(product.id, 1, value);
+      flyToCart(img);
+    });
 
     qtyControl.appendChild(minus);
     qtyControl.appendChild(value);
@@ -183,7 +206,7 @@ function adjustQty(productId, delta, valueElement) {
   renderCartView();
 }
 
-// Mise à jour barre panier + pulse
+// Mise à jour barre panier + pulse + neon
 function updateCartBar() {
   const cartItems = Object.entries(cart);
   const count = cartItems.reduce((acc, [, qty]) => acc + qty, 0);
@@ -197,6 +220,14 @@ function updateCartBar() {
 
   countEl.textContent = count === 1 ? "1 article" : `${count} articles`;
   totalEl.textContent = `${total} €`;
+
+  // Neon boost sur les textes
+  countEl.classList.remove("neon-boost");
+  totalEl.classList.remove("neon-boost");
+  void countEl.offsetWidth;
+  void totalEl.offsetWidth;
+  countEl.classList.add("neon-boost");
+  totalEl.classList.add("neon-boost");
 
   const totalPage = document.getElementById("cartTotalPage");
   if (totalPage) {
@@ -257,7 +288,9 @@ function renderCartView() {
 function initCartBar() {
   document.getElementById("payButton").addEventListener("click", openPaymentModal);
   const payPage = document.getElementById("payButtonPage");
-  payPage.addEventListener("click", openPaymentModal);
+  if (payPage) {
+    payPage.addEventListener("click", openPaymentModal);
+  }
 }
 
 // Modal paiement
@@ -303,10 +336,10 @@ function initTabs() {
 
   function setActiveTab(tab) {
     Object.keys(views).forEach((key) => {
-      if (views[key]) {
-        views[key].classList.toggle("view-active", key === tab);
-        views[key].classList.toggle("view-hidden", key !== tab);
-      }
+      const view = views[key];
+      if (!view) return;
+      view.classList.toggle("view-active", key === tab);
+      view.classList.toggle("view-hidden", key !== tab);
     });
 
     navButtons.forEach((btn) => {

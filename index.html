@@ -10,42 +10,68 @@
 </head>
 
 <body>
+  <!-- CONTENEUR APP -->
   <div id="app">
 
-    <header class="app-header">
-      <div class="app-title">
-        <span class="app-name">CardStore</span>
-        <span class="app-subtitle">Cartes cadeaux crypto</span>
+    <!-- PAGE BOUTIQUE -->
+    <section id="page-shop" class="page active">
+      <header class="app-header">
+        <div class="app-title-block">
+          <h1 class="app-name">CardStore</h1>
+          <p class="app-subtitle">Cartes cadeaux crypto</p>
+        </div>
+      </header>
+
+      <!-- Filtres -->
+      <div class="filters">
+        <select id="brandFilter" class="filter-select">
+          <option value="all">Toutes les marques</option>
+        </select>
+
+        <select id="amountFilter" class="filter-select">
+          <option value="all">Tous les montants</option>
+          <option value="25">25€</option>
+          <option value="50">50€</option>
+          <option value="100">100€</option>
+        </select>
       </div>
-    </header>
 
-    <!-- Filtres -->
-    <section class="filters">
-      <select id="brandFilter" class="filter-select">
-        <option value="all">Toutes les marques</option>
-      </select>
-
-      <select id="amountFilter" class="filter-select">
-        <option value="all">Tous les montants</option>
-        <option value="25">25€</option>
-        <option value="50">50€</option>
-        <option value="100">100€</option>
-      </select>
+      <!-- Grille produits -->
+      <div id="productsGrid" class="products-grid"></div>
     </section>
 
-    <!-- Produits -->
-    <section id="productsGrid" class="products-grid"></section>
+    <!-- PAGE PANIER -->
+    <section id="page-cart" class="page">
+      <header class="page-header">
+        <h2 class="page-title">Mon panier</h2>
+        <p class="page-subtitle">Résumé de tes cartes cadeaux</p>
+      </header>
+
+      <div id="cartContent" class="cart-content"></div>
+
+      <footer class="cart-footer">
+        <div class="cart-footer-left">
+          <span id="cartTotalLabel" class="cart-footer-label">Total</span>
+          <span id="cartTotalValue" class="cart-footer-value">0 €</span>
+        </div>
+        <button id="payButton" class="pay-btn">Payer en TON</button>
+      </footer>
+    </section>
+
+    <!-- PAGE PROFIL -->
+    <section id="page-profile" class="page">
+      <header class="page-header">
+        <h2 class="page-title">Profil</h2>
+        <p class="page-subtitle">Fonctionnalités à venir…</p>
+      </header>
+      <p class="profile-text">
+        Bientôt : historique d’achats, favoris, paramètres, etc.
+      </p>
+    </section>
 
   </div>
 
-  <!-- Barre Panier -->
-  <div id="cartBar" class="cart-bar">
-    <div id="cartItemsCount">0 article</div>
-    <div id="cartTotal">0 €</div>
-    <button id="payButton" class="pay-btn">Payer en TON</button>
-  </div>
-
-  <!-- Navigation bas -->
+  <!-- BARRE DE NAVIGATION -->
   <nav class="nav-bar">
     <button class="nav-btn" id="btn-shop">
       <span class="nav-icon-emoji">🛍️</span>
@@ -63,6 +89,10 @@
     </button>
   </nav>
 
+  <!-- Conteneur pour l’orbe d’animation -->
+  <div id="animContainer"></div>
+
+  <!-- Script principal -->
   <script src="app.js"></script>
 </body>
 </html>

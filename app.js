@@ -19,7 +19,7 @@ const BRANDS = [
 const DEFAULT_AMOUNTS = [25, 50, 100];
 const SPOTIFY_AMOUNTS = [11, 33, 66];
 
-// Images des cartes-cadeaux
+// Mapping marque → image
 const BRAND_IMAGES = {
   Amazon: "amazon.png",
   Netflix: "netflix.png",
@@ -34,7 +34,7 @@ const BRAND_IMAGES = {
   PlayStation: "playstation2.png"
 };
 
-// Construction automatique des produits
+// Génération des produits
 const PRODUCTS = [];
 BRANDS.forEach((brand) => {
   const amounts = brand === "Spotify" ? SPOTIFY_AMOUNTS : DEFAULT_AMOUNTS;
@@ -54,13 +54,15 @@ BRANDS.forEach((brand) => {
 // Panier : { productId: qty }
 const cart = {};
 
+// Telegram init
 function initTelegram() {
-  if (window.Telegram && Telegram.WebApp) {
+  if (window.Telegram && window.Telegram.WebApp) {
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
   }
 }
 
+// Filtres
 function initFilters() {
   const brandSelect = document.getElementById("brandFilter");
   BRANDS.forEach((brand) => {
@@ -71,9 +73,12 @@ function initFilters() {
   });
 
   brandSelect.addEventListener("change", renderProducts);
-  document.getElementById("amountFilter").addEventListener("change", renderProducts);
+  document
+    .getElementById("amountFilter")
+    .addEventListener("change", renderProducts);
 }
 
+// Rendu des produits (boutique)
 function renderProducts() {
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = "";
@@ -161,48 +166,103 @@ function renderProducts() {
   });
 }
 
+// Ajustement quantité
 function adjustQty(productId, delta, valueElement) {
   const current = cart[productId] || 0;
   let next = current + delta;
-
   if (next < 0) next = 0;
 
   cart[productId] = next;
   valueElement.textContent = next;
 
-  if (next === 0) delete cart[productId];
+  if (next === 0) {
+    delete cart[productId];
+  }
 
   updateCartBar();
+  renderCartView();
 }
 
+// Mise à jour barre panier + pulse
 function updateCartBar() {
   const cartItems = Object.entries(cart);
-
   const count = cartItems.reduce((acc, [, qty]) => acc + qty, 0);
   const total = cartItems.reduce((acc, [id, qty]) => {
-    const p = PRODUCTS.find((x) => x.id === id);
-    return acc + p.amount * qty;
+    const product = PRODUCTS.find((p) => p.id === id);
+    return acc + product.amount * qty;
   }, 0);
 
-  document.getElementById("cartItemsCount").textContent =
-    count === 1 ? "1 article" : `${count} articles`;
+  const countEl = document.getElementById("cartItemsCount");
+  const totalEl = document.getElementById("cartTotal");
 
-  document.getElementById("cartTotal").textContent = `${total} €`;
+  countEl.textContent = count === 1 ? "1 article" : `${count} articles`;
+  totalEl.textContent = `${total} €`;
 
-  // 🔥 Animation Futuriste CyberPulse
+  const totalPage = document.getElementById("cartTotalPage");
+  if (totalPage) {
+    totalPage.textContent = `${total} €`;
+  }
+
+  // Animation pulse sur la barre
   const bar = document.querySelector(".cart-bar");
-  bar.classList.remove("pulse");
-  void bar.offsetWidth; // Reset animation
-  bar.classList.add("pulse");
+  if (bar) {
+    bar.classList.remove("pulse");
+    void bar.offsetWidth;
+    bar.classList.add("pulse");
+  }
 }
 
+// Rendu de la vue panier (page)
+function renderCartView() {
+  const container = document.getElementById("cartItemsList");
+  container.innerHTML = "";
+
+  const cartItems = Object.entries(cart);
+  if (cartItems.length === 0) {
+    container.innerHTML = `<p style="font-size:13px;color:#aaa;">Ton panier est vide. Ajoute des cartes depuis l’onglet boutique 🏪.</p>`;
+    return;
+  }
+
+  cartItems.forEach(([id, qty]) => {
+    const product = PRODUCTS.find((p) => p.id === id);
+    if (!product) return;
+
+    const row = document.createElement("div");
+    row.className = "cart-item-row";
+
+    const main = document.createElement("div");
+    main.className = "cart-item-main";
+
+    const brandEl = document.createElement("div");
+    brandEl.className = "cart-item-brand";
+    brandEl.textContent = product.brand;
+    main.appendChild(brandEl);
+
+    const meta = document.createElement("div");
+    meta.className = "cart-item-meta";
+    meta.textContent = `${product.amount}€ × ${qty}`;
+    main.appendChild(meta);
+
+    const total = document.createElement("div");
+    total.className = "cart-item-total";
+    total.textContent = `${product.amount * qty} €`;
+
+    row.appendChild(main);
+    row.appendChild(total);
+    container.appendChild(row);
+  });
+}
+
+// Init bouton payer (barre + page)
 function initCartBar() {
   document.getElementById("payButton").addEventListener("click", openPaymentModal);
+  const payPage = document.getElementById("payButtonPage");
+  payPage.addEventListener("click", openPaymentModal);
 }
 
+// Modal paiement
 function openPaymentModal() {
   const cartItems = Object.entries(cart);
-
   if (cartItems.length === 0) {
     alert("Ton panier est vide.");
     return;
@@ -219,7 +279,6 @@ function openPaymentModal() {
   });
 
   const summary = `Total : ${total} €\n\n${lines.join("\n")}`;
-
   document.getElementById("paymentSummary").textContent = summary;
   document.getElementById("tonAddress").textContent = TON_ADDRESS;
 
@@ -232,12 +291,48 @@ function initModal() {
   });
 }
 
-// Initialisation
+// Onglets (nav métal argent)
+function initTabs() {
+  const views = {
+    shop: document.getElementById("shopView"),
+    cart: document.getElementById("cartView"),
+    profile: document.getElementById("profileView")
+  };
+
+  const navButtons = document.querySelectorAll(".nav-btn");
+
+  function setActiveTab(tab) {
+    Object.keys(views).forEach((key) => {
+      if (views[key]) {
+        views[key].classList.toggle("view-active", key === tab);
+        views[key].classList.toggle("view-hidden", key !== tab);
+      }
+    });
+
+    navButtons.forEach((btn) => {
+      btn.classList.toggle("nav-btn-active", btn.dataset.tab === tab);
+    });
+  }
+
+  navButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab;
+      setActiveTab(tab);
+    });
+  });
+
+  // Onglet par défaut = panier
+  setActiveTab("cart");
+}
+
+// INITIALISATION
 document.addEventListener("DOMContentLoaded", () => {
   initTelegram();
   initFilters();
   renderProducts();
   updateCartBar();
+  renderCartView();
   initCartBar();
   initModal();
+  initTabs();
 });

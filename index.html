@@ -2,70 +2,67 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CardStore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <div id="app">
 
-  <!-- PAGE PANIER (onglet par défaut) -->
-  <section id="page-cart" class="page active">
-    <h2 class="page-title">🛒 Mon Panier</h2>
-    <div id="cartContent" class="cart-content">
-      <!-- contenu généré par JS -->
-    </div>
-  </section>
+    <header class="app-header">
+      <div class="app-title">
+        <span class="app-name">CardStore</span>
+        <span class="app-subtitle">Cartes cadeaux crypto</span>
+      </div>
+    </header>
 
-  <!-- PAGE BOUTIQUE -->
-  <section id="page-shop" class="page">
-    <div class="filters">
-      <select id="brandFilter">
+    <!-- Filtres -->
+    <section class="filters">
+      <select id="brandFilter" class="filter-select">
         <option value="all">Toutes les marques</option>
       </select>
 
-      <select id="amountFilter">
+      <select id="amountFilter" class="filter-select">
         <option value="all">Tous les montants</option>
+        <option value="25">25€</option>
+        <option value="50">50€</option>
+        <option value="100">100€</option>
       </select>
-    </div>
+    </section>
 
-    <div id="productsGrid" class="products-grid">
-      <!-- cartes produits -->
-    </div>
-  </section>
+    <!-- Produits -->
+    <section id="productsGrid" class="products-grid"></section>
 
-  <!-- PAGE PROFIL -->
-  <section id="page-profile" class="page">
-    <h2 class="page-title">👤 Profil</h2>
-    <p class="profile-text">Fonctionnalités à venir…</p>
-  </section>
+  </div>
 
-  <!-- BARRE DE NAVIGATION -->
+  <!-- Barre Panier -->
+  <div id="cartBar" class="cart-bar">
+    <div id="cartItemsCount">0 article</div>
+    <div id="cartTotal">0 €</div>
+    <button id="payButton" class="pay-btn">Payer en TON</button>
+  </div>
+
+  <!-- Navigation bas -->
   <nav class="nav-bar">
-    <div class="nav-btn" id="btn-shop">
-      <img src="icons/shop.png" class="nav-icon" />
-    </div>
+    <button class="nav-btn" id="btn-shop">
+      <span class="nav-icon-emoji">🛍️</span>
+    </button>
 
-    <div class="nav-btn active" id="btn-cart">
-      <div class="cart-wrapper">
-        <img src="icons/cart.png" id="cartIcon" class="nav-icon" />
+    <button class="nav-btn active" id="btn-cart">
+      <span id="cartIcon" class="nav-icon-emoji cart-icon-wrapper">
+        🛒
         <span id="cartBadge" class="cart-badge">0</span>
-      </div>
-    </div>
+      </span>
+    </button>
 
-    <div class="nav-btn" id="btn-profile">
-      <img src="icons/profile.png" class="nav-icon" />
-    </div>
+    <button class="nav-btn" id="btn-profile">
+      <span class="nav-icon-emoji">👤</span>
+    </button>
   </nav>
 
-  <!-- Conteneur pour l’orbe de l’animation -->
-  <div id="animContainer"></div>
-
-  <!-- Script principal -->
   <script src="app.js"></script>
-
 </body>
 </html>

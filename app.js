@@ -311,7 +311,10 @@ function openPaymentModal() {
     return `• ${product.brand} ${product.amount}€ × ${qty}`;
   });
 
-  const summary = `Total : ${total} €\n\n${lines.join("\n")}`;
+  const summary = `Total : ${total} €
+
+${lines.join("
+")}`;
   document.getElementById("paymentSummary").textContent = summary;
   document.getElementById("tonAddress").textContent = TON_ADDRESS;
 

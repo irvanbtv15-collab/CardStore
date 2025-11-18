@@ -4,9 +4,11 @@ const TON_ADDRESS = "UQBTVuv4H6h-9wFxYSO1Z3w9IOAnz7_W-han4_";
 // === ANIMATION: FLY TO CART ===
 function flyToCart(imgElement) {
   if (!imgElement) return;
+
   const imgRect = imgElement.getBoundingClientRect();
   const cartBar = document.querySelector(".cart-bar");
   if (!cartBar) return;
+
   const cartRect = cartBar.getBoundingClientRect();
 
   const clone = imgElement.cloneNode(true);
@@ -17,7 +19,9 @@ function flyToCart(imgElement) {
   clone.style.top = imgRect.top + "px";
 
   requestAnimationFrame(() => {
-    clone.style.transform = `translate(${cartRect.left - imgRect.left + 40}px, ${cartRect.top - imgRect.top}px) scale(0.2)`;
+    clone.style.transform = `translate(${cartRect.left - imgRect.left + 40}px, ${
+      cartRect.top - imgRect.top
+    }px) scale(0.2)`;
     clone.style.opacity = "0";
   });
 
@@ -96,7 +100,9 @@ function initFilters() {
   });
 
   brandSelect.addEventListener("change", renderProducts);
-  document.getElementById("amountFilter").addEventListener("change", renderProducts);
+  document
+    .getElementById("amountFilter")
+    .addEventListener("change", renderProducts);
 }
 
 // Rendu des produits (boutique)
@@ -109,7 +115,8 @@ function renderProducts() {
 
   const filtered = PRODUCTS.filter((p) => {
     const brandOk = brandFilter === "all" || p.brand === brandFilter;
-    const amountOk = amountFilter === "all" || p.amount === Number(amountFilter);
+    const amountOk =
+      amountFilter === "all" || p.amount === Number(amountFilter);
     return brandOk && amountOk;
   });
 
@@ -174,7 +181,7 @@ function renderProducts() {
 
     plus.addEventListener("click", () => {
       adjustQty(product.id, 1, value);
-      flyToCart(img);
+      flyToCart(img); // animation premium
     });
 
     qtyControl.appendChild(minus);
@@ -212,22 +219,25 @@ function updateCartBar() {
   const count = cartItems.reduce((acc, [, qty]) => acc + qty, 0);
   const total = cartItems.reduce((acc, [id, qty]) => {
     const product = PRODUCTS.find((p) => p.id === id);
-    return acc + product.amount * qty;
+    return acc + (product ? product.amount * qty : 0);
   }, 0);
 
   const countEl = document.getElementById("cartItemsCount");
   const totalEl = document.getElementById("cartTotal");
 
-  countEl.textContent = count === 1 ? "1 article" : `${count} articles`;
-  totalEl.textContent = `${total} €`;
+  if (countEl) {
+    countEl.textContent = count === 1 ? "1 article" : `${count} articles`;
+    countEl.classList.remove("neon-boost");
+    void countEl.offsetWidth;
+    countEl.classList.add("neon-boost");
+  }
 
-  // Neon boost sur les textes
-  countEl.classList.remove("neon-boost");
-  totalEl.classList.remove("neon-boost");
-  void countEl.offsetWidth;
-  void totalEl.offsetWidth;
-  countEl.classList.add("neon-boost");
-  totalEl.classList.add("neon-boost");
+  if (totalEl) {
+    totalEl.textContent = `${total} €`;
+    totalEl.classList.remove("neon-boost");
+    void totalEl.offsetWidth;
+    totalEl.classList.add("neon-boost");
+  }
 
   const totalPage = document.getElementById("cartTotalPage");
   if (totalPage) {
@@ -246,11 +256,14 @@ function updateCartBar() {
 // Rendu de la vue panier (page)
 function renderCartView() {
   const container = document.getElementById("cartItemsList");
+  if (!container) return;
+
   container.innerHTML = "";
 
   const cartItems = Object.entries(cart);
   if (cartItems.length === 0) {
-    container.innerHTML = `<p style="font-size:13px;color:#aaa;">Ton panier est vide. Ajoute des cartes depuis l’onglet boutique 🏪.</p>`;
+    container.innerHTML =
+      '<p style="font-size:13px;color:#aaa;">Ton panier est vide. Ajoute des cartes depuis l’onglet boutique 🏪.</p>';
     return;
   }
 
@@ -286,7 +299,11 @@ function renderCartView() {
 
 // Init bouton payer (barre + page)
 function initCartBar() {
-  document.getElementById("payButton").addEventListener("click", openPaymentModal);
+  const payHud = document.getElementById("payButton");
+  if (payHud) {
+    payHud.addEventListener("click", openPaymentModal);
+  }
+
   const payPage = document.getElementById("payButtonPage");
   if (payPage) {
     payPage.addEventListener("click", openPaymentModal);
@@ -303,18 +320,16 @@ function openPaymentModal() {
 
   const total = cartItems.reduce((acc, [id, qty]) => {
     const product = PRODUCTS.find((p) => p.id === id);
-    return acc + product.amount * qty;
+    return acc + (product ? product.amount * qty : 0);
   }, 0);
 
   const lines = cartItems.map(([id, qty]) => {
     const product = PRODUCTS.find((p) => p.id === id);
+    if (!product) return "";
     return `• ${product.brand} ${product.amount}€ × ${qty}`;
   });
 
-  const summary = `Total : ${total} €
-
-${lines.join("
-")}`;
+  const summary = `Total : ${total} €\n\n${lines.join("\n")}`;
   document.getElementById("paymentSummary").textContent = summary;
   document.getElementById("tonAddress").textContent = TON_ADDRESS;
 
@@ -322,7 +337,10 @@ ${lines.join("
 }
 
 function initModal() {
-  document.getElementById("closeModal").addEventListener("click", () => {
+  const closeBtn = document.getElementById("closeModal");
+  if (!closeBtn) return;
+
+  closeBtn.addEventListener("click", () => {
     document.getElementById("paymentModal").classList.remove("active");
   });
 }

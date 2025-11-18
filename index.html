@@ -1,61 +1,117 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>CardStore</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <head>
+    <meta charset="UTF-8" />
+    <title>CardStore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="app-title">
+          <div class="app-name">CardStore</div>
+          <div class="app-subtitle">Cartes cadeaux • Paiement TON</div>
+        </div>
+      </header>
 
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+      <!-- VUES (onglets) -->
+      <main>
+        <!-- VUE BOUTIQUE -->
+        <section id="shopView" class="view view-hidden">
+          <div class="filters">
+            <div class="filter-group">
+              <label for="brandFilter">Marque</label>
+              <select id="brandFilter">
+                <option value="all">Toutes</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="amountFilter">Montant</label>
+              <select id="amountFilter">
+                <option value="all">Tous</option>
+                <option value="25">25€</option>
+                <option value="50">50€</option>
+                <option value="100">100€</option>
+                <option value="11">11€</option>
+                <option value="33">33€</option>
+                <option value="66">66€</option>
+              </select>
+            </div>
+          </div>
 
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="app">
-    <!-- HEADER -->
-    <header class="main-header">
-      <h1 class="logo">CARDSTORE</h1>
-      <p class="subtitle">Cartes cadeaux • Paiement TON</p>
-    </header>
+          <section id="productsGrid" class="products-grid">
+            <!-- Cartes générées en JS -->
+          </section>
+        </section>
 
-    <!-- FILTRES -->
-    <section class="filters-row">
-      <div class="filter-group">
-        <label for="brandFilter">Marque</label>
-        <select id="brandFilter" class="filter-select">
-          <option value="all">Toutes</option>
-        </select>
-      </div>
+        <!-- VUE PANIER (onglet par défaut) -->
+        <section id="cartView" class="view view-active">
+          <h2 class="view-title">🛒 Ton panier</h2>
+          <div id="cartItemsList" class="cart-items-list">
+            <!-- Items panier générés en JS -->
+          </div>
+          <div class="cart-summary-page">
+            <div class="cart-summary-line">
+              <span>Total</span>
+              <span id="cartTotalPage">0 €</span>
+            </div>
+            <button id="payButtonPage" class="btn-primary wide">
+              Payer en TON
+            </button>
+          </div>
+        </section>
 
-      <div class="filter-group">
-        <label for="amountFilter">Montant</label>
-        <select id="amountFilter" class="filter-select">
-          <option value="all">Tous</option>
-          <option value="25">25€</option>
-          <option value="50">50€</option>
-          <option value="100">100€</option>
-        </select>
-      </div>
-    </section>
-
-    <!-- PRODUITS -->
-    <main>
-      <div id="productsGrid" class="products-grid"></div>
-    </main>
-  </div>
-
-  <!-- BARRE PANIER -->
-  <footer class="cart-bar">
-    <div class="cart-info">
-      <span id="cartSummary" class="cart-summary">0 article</span>
-      <span id="cartTotal" class="cart-total">0 €</span>
+        <!-- VUE PROFIL (placeholder) -->
+        <section id="profileView" class="view view-hidden">
+          <h2 class="view-title">👤 Profil</h2>
+          <p class="profile-text">
+            Bientôt : historique des achats, gestion des comptes, promos
+            personnalisées...
+          </p>
+        </section>
+      </main>
     </div>
-    <button id="payButton" class="pay-btn">Payer en TON</button>
-  </footer>
 
-  <!-- Conteneur pour l’animation orbe -->
-  <div id="animContainer"></div>
+    <!-- BARRE PANIER FIXE (HUD) -->
+    <div class="cart-bar">
+      <div class="cart-info">
+        <span id="cartItemsCount">0 article</span>
+        <span id="cartTotal">0 €</span>
+      </div>
+      <button id="payButton" class="btn-primary">Payer en TON</button>
+    </div>
 
-  <script src="app.js"></script>
-</body>
+    <!-- NAV BAR MÉTAL ARGENT -->
+    <nav class="bottom-nav">
+      <button class="nav-btn" data-tab="shop" aria-label="Boutique">🏪</button>
+      <button class="nav-btn nav-btn-active" data-tab="cart" aria-label="Panier">🛒</button>
+      <button class="nav-btn" data-tab="profile" aria-label="Profil">👤</button>
+    </nav>
+
+    <!-- MODAL PAIEMENT -->
+    <div id="paymentModal" class="modal-backdrop">
+      <div class="modal">
+        <h2>Paiement TON</h2>
+        <p>Résumé de ta commande :</p>
+        <pre id="paymentSummary"></pre>
+
+        <div class="payment-address">
+          Adresse TON à payer :
+          <code id="tonAddress"></code>
+        </div>
+
+        <p class="modal-note">
+          Après ton paiement, envoie le reçu ou TX hash pour recevoir tes cartes
+          cadeaux.
+        </p>
+
+        <button id="closeModal" class="btn-secondary">Fermer</button>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
 </html>

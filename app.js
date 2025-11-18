@@ -21,18 +21,19 @@ const SPOTIFY_AMOUNTS = [11, 33, 66];
 
 // Petit mapping marque → image
 const BRAND_IMAGES = {
-  Amazon: "images/amazon.png",
-  Netflix: "images/netflix.png",
-  Zalando: "images/zalando.png",
-  Spotify: "images/spotify.png",
-  Airbnb: "images/airbnb.png",
-  Adidas: "images/adidas.png",
-  Footlocker: "images/footlocker2.png",
-  Flixbus: "images/flixbus.png",
-  Nintendo: "images/nintendo.png",
-  Xbox: "images/xbox.png",
-  PlayStation: "images/playstation2.png"
+  Amazon: "amazon.png",
+  Netflix: "netflix.png",
+  Zalando: "zalando.png",
+  Spotify: "spotify.png",
+  Airbnb: "airbnb.png",
+  Adidas: "adidas.png",
+  Footlocker: "footlocker2.png",
+  Flixbus: "flixbus.png",
+  Nintendo: "nintendo.png",
+  Xbox: "xbox.png",
+  PlayStation: "playstation2.png"
 };
+
 
 // Génération de la liste de produits (une carte par montant)
 const PRODUCTS = [];
@@ -228,4 +229,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initCartBar();
   initModal();
 });
+
 
